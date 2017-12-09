@@ -114,10 +114,15 @@ public class Jabeja {
       int dqp = getDegree(q, p.getColor());
       double _new = Math.pow(dpq, alpha) + Math.pow(dqp, alpha); 
 
+      float = ap = acceptance_probability(_old, _new, T); 
+      
+      
+      /*
       if(_new * T > _old && _new > highestBenefit){
         bestPartner = q; 
         highestBenefit = _new; 
       }
+      */
     }
 
     return bestPartner;
