@@ -23,5 +23,7 @@ public class RandNoGenerator {
         return rand.nextInt(number);
     }
 
-
+    public static float nextFloat(float min, float max){
+        return rand.nextFloat() * (max - min) + min;
+    }
 }

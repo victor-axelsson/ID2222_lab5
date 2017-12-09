@@ -34,6 +34,10 @@ public class Jabeja {
 
   //-------------------------------------------------------------------
   public void startJabeja() throws IOException {
+
+    System.out.println(config.getAlpha()); 
+
+
     for (round = 0; round < config.getRounds(); round++) {
       for (int id : entireGraph.keySet()) {
         sampleAndSwap(id);
@@ -50,11 +54,15 @@ public class Jabeja {
    * Simulated analealing cooling function
    */
   private void saCoolDown(){
+    /*
     // TODO for second task
     if (T > 1)
       T -= config.getDelta();
     if (T < 1)
       T = 1;
+      */
+
+      T = T * config.getDelta(); 
   }
 
   /**
@@ -114,8 +122,20 @@ public class Jabeja {
       int dqp = getDegree(q, p.getColor());
       double _new = Math.pow(dpq, alpha) + Math.pow(dqp, alpha); 
 
-      float = ap = acceptance_probability(_old, _new, T); 
+      double ap = acceptance_probability(_new, _old, T); 
       
+      /*
+      System.out.println(RandNoGenerator.nextFloat(0.0f, 1.0f)); 
+      System.out.println(ap); 
+      System.out.println(_old); 
+      System.out.println(_new); 
+      System.out.println("==="); 
+      */
+
+      if(ap > RandNoGenerator.nextFloat(0.0f, 1.0f)){
+        bestPartner = q; 
+        highestBenefit = _new;
+      }
       
       /*
       if(_new * T > _old && _new > highestBenefit){
@@ -127,6 +147,12 @@ public class Jabeja {
 
     return bestPartner;
   }
+
+
+  private double acceptance_probability(double _old, double _new, Float T){
+    return java.lang.Math.E * (_old - _new) / T; 
+  }
+
 
   /**
    * The the degreee on the node based on color

@@ -1,3 +1,7 @@
 
 task1.png
 2017-12-09 14:37:27 INFO  Jabeja:238 - round: 999, edge cut:2604, swaps: 1580209, migrations: 3328
+
+task2_pt1.png
+using delta 0.999
+2017-12-09 15:17:25 INFO  Jabeja:269 - round: 999, edge cut:1839, swaps: 40030, migrations: 3394
