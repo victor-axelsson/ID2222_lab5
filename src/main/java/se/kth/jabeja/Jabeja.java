@@ -34,50 +34,15 @@ public class Jabeja {
 
   //-------------------------------------------------------------------
   public void startJabeja() throws IOException {
-
-
-    int new_cost = -1;
-    int old_cost = -1;
-
-    /*
-    GraphInitColorPolicy
-    NodeSelectionPolicy
-    setRandNeighborsSampleSize
-    setTemperature
-    setDelta
-    setUniformRandSampleSize
-    */
-
-    int num_of_hyperparameter_rounds = 10;
-    System.out.println(RandNoGenerator.nextInt(10)); 
-
-    for(int i = 0; i < num_of_hyperparameter_rounds; i++){
-
-        this.nodeIds = new ArrayList(entireGraph.keySet());
-        this.round = 0;
-        this.numberOfSwaps = 0;
-        this.config = config;
-        this.T = config.getTemperature();
-
-
-      for (round = 0; round < config.getRounds(); round++) {
-        for (int id : entireGraph.keySet()) {
-          sampleAndSwap(id);
-        }
-
-        //one cycle for all nodes have completed.
-        //reduce the temperature
-        saCoolDown();
-        report();
-
-        if(round == 0){
-          new_cost = edge_cut; 
-        }else{
-          old_cost = new_cost;
-          new_cost = edge_cut;
-        }
-
+    for (round = 0; round < config.getRounds(); round++) {
+      for (int id : entireGraph.keySet()) {
+        sampleAndSwap(id);
       }
+
+      //one cycle for all nodes have completed.
+      //reduce the temperature
+      saCoolDown();
+      report();
     }
   }
 
