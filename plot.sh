@@ -10,4 +10,9 @@ fi
 
 gnuplot -e "filename='$1'" graph.gnuplot
 
+
+## Use this on linux ##
+# xdg-open graph.png
+
+# And this is for mac
 open graph.png

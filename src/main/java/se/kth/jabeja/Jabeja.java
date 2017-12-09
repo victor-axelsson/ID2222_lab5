@@ -19,6 +19,7 @@ public class Jabeja {
   private int round;
   private float T;
   private boolean resultFileCreated = false;
+  private int edge_cut;
 
   //-------------------------------------------------------------------
   public Jabeja(HashMap<Integer, Node> graph, Config config) {
@@ -33,15 +34,50 @@ public class Jabeja {
 
   //-------------------------------------------------------------------
   public void startJabeja() throws IOException {
-    for (round = 0; round < config.getRounds(); round++) {
-      for (int id : entireGraph.keySet()) {
-        sampleAndSwap(id);
-      }
 
-      //one cycle for all nodes have completed.
-      //reduce the temperature
-      saCoolDown();
-      report();
+
+    int new_cost = -1;
+    int old_cost = -1;
+
+    /*
+    GraphInitColorPolicy
+    NodeSelectionPolicy
+    setRandNeighborsSampleSize
+    setTemperature
+    setDelta
+    setUniformRandSampleSize
+    */
+
+    int num_of_hyperparameter_rounds = 10;
+    System.out.println(RandNoGenerator.nextInt(10)); 
+
+    for(int i = 0; i < num_of_hyperparameter_rounds; i++){
+
+        this.nodeIds = new ArrayList(entireGraph.keySet());
+        this.round = 0;
+        this.numberOfSwaps = 0;
+        this.config = config;
+        this.T = config.getTemperature();
+
+
+      for (round = 0; round < config.getRounds(); round++) {
+        for (int id : entireGraph.keySet()) {
+          sampleAndSwap(id);
+        }
+
+        //one cycle for all nodes have completed.
+        //reduce the temperature
+        saCoolDown();
+        report();
+
+        if(round == 0){
+          new_cost = edge_cut; 
+        }else{
+          old_cost = new_cost;
+          new_cost = edge_cut;
+        }
+
+      }
     }
   }
 
@@ -61,33 +97,63 @@ public class Jabeja {
    * @param nodeId
    */
   private void sampleAndSwap(int nodeId) {
-    Node partner = null;
     Node nodep = entireGraph.get(nodeId);
+    Node partner = null;
 
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.LOCAL) {
       // swap with random neighbors
-      // TODO
+      partner = findPartner(nodeId, getNeighbors(nodep));
+
     }
 
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
       // if local policy fails then randomly sample the entire graph
-      // TODO
+      if(partner == null){
+        partner = findPartner(nodeId, getSample(nodeId));
+      }
     }
 
-    // swap the colors
-    // TODO
+    if(partner != null){
+      // swap the colors
+      nodep.setColor(nodep.getColor() ^ partner.getColor());
+      partner.setColor(partner.getColor() ^ nodep.getColor());
+      nodep.setColor(nodep.getColor() ^ partner.getColor());
+
+      numberOfSwaps++; 
+    }
+    
   }
 
   public Node findPartner(int nodeId, Integer[] nodes){
 
-    Node nodep = entireGraph.get(nodeId);
-
+    Node p = entireGraph.get(nodeId);
     Node bestPartner = null;
     double highestBenefit = 0;
 
-    // TODO
+    Float alpha = config.getAlpha();
+
+
+    for(Integer qId : nodes){
+      //Grab the nodes
+      Node q = entireGraph.get(qId);
+
+      //Calc old
+      int dpp = getDegree(p, p.getColor());
+      int dqq = getDegree(q, q.getColor());
+      double _old = Math.pow(dpp, alpha) + Math.pow(dqq, alpha); 
+
+      //Calc new
+      int dpq = getDegree(p, q.getColor());
+      int dqp = getDegree(q, p.getColor());
+      double _new = Math.pow(dpq, alpha) + Math.pow(dqp, alpha); 
+
+      if(_new * T > _old && _new > highestBenefit){
+        bestPartner = q; 
+        highestBenefit = _new; 
+      }
+    }
 
     return bestPartner;
   }
@@ -202,6 +268,7 @@ public class Jabeja {
     }
 
     int edgeCut = grayLinks / 2;
+    edge_cut = edgeCut;
 
     logger.info("round: " + round +
             ", edge cut:" + edgeCut +

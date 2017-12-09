@@ -1,5 +1,5 @@
 #!/bin/bash
 
 ./compile.sh
-./run -graph ./graphs/3elt.graph
-./plot.sh output/result
+./run.sh -graph ./graphs/3elt.graph
+./plot.sh output/*.txt
